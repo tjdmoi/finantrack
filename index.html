@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="description" content="FinanTrack - Control de deudas, metas y dinero">
+    <title>FinanTrack v0.5.0</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="app-header">
+    <div>
+        <h1>FinanTrack</h1>
+        <p>Control financiero personal</p>
+    </div>
+
+    <button class="icon-btn" id="btnMenu" aria-label="Menú">
+        ☰
+    </button>
+</header>
+
+<main class="container">
+
+    <!-- RESUMEN -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <span>Deudas</span>
+            <strong id="summaryDebt">$0.00</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Metas</span>
+            <strong id="summaryGoals">$0.00</strong>
+        </div>
+
+        <div class="summary-card highlight">
+            <span>Mi Dinero</span>
+            <strong id="summaryMoney">$0.00</strong>
+        </div>
+
+    </section>
+
+    <!-- NAVEGACIÓN -->
+    <nav class="main-tabs">
+
+        <button class="tab-btn active" data-section="dashboard">
+            🏠 Inicio
+        </button>
+
+        <button class="tab-btn" data-section="money">
+            💰 Mi Dinero
+        </button>
+
+        <button class="tab-btn" data-section="debts">
+            💳 Deudas
+        </button>
+
+        <button class="tab-btn" data-section="goals">
+            🎯 Metas
+        </button>
+
+    </nav>
+
+
+    <!-- ========================= -->
+    <!-- INICIO -->
+    <!-- ========================= -->
+
+    <section id="section-dashboard" class="app-section active">
+
+        <div class="section-header">
+            <div>
+                <h2>Resumen</h2>
+                <p>Tu situación financiera</p>
+            </div>
+        </div>
+
+        <div id="dashboardContent"></div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- MI DINERO -->
+    <!-- ========================= -->
+
+    <section id="section-money" class="app-section">
+
+        <div class="section-header">
+
+            <div>
+                <h2>💰 Mi Dinero</h2>
+                <p>Administra tu dinero por período</p>
+            </div>
+
+            <button class="primary-btn" id="btnNewPeriod">
+                + Nuevo período
+            </button>
+
+        </div>
+
+
+        <!-- SELECTOR DE PERÍODO -->
+
+        <div class="period-selector-card">
+
+            <label for="periodSelector">
+                Período
+            </label>
+
+            <select id="periodSelector"></select>
+
+            <div class="period-actions">
+
+                <button class="secondary-btn" id="btnEditPeriod">
+                    ✏️ Editar
+                </button>
+
+                <button class="danger-outline-btn" id="btnDeletePeriod">
+                    🗑️ Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESUMEN DEL PERÍODO -->
+
+        <div id="moneySummary"></div>
+
+
+        <!-- TAREAS -->
+
+        <div class="section-header compact">
+
+            <div>
+                <h3>Items del período</h3>
+                <p>Marca una tarea cuando realices el pago o gasto.</p>
+            </div>
+
+            <button class="primary-btn" id="btnNewMoneyItem">
+                + Agregar
+            </button>
+
+        </div>
+
+        <div id="moneyItems"></div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- DEUDAS -->
+    <!-- ========================= -->
+
+    <section id="section-debts" class="app-section">
+
+        <div class="section-header">
+
+            <div>
+                <h2>💳 Deudas</h2>
+                <p>Control de cuotas y amortización</p>
+            </div>
+
+            <button class="primary-btn" id="btnNewDebt">
+                + Nueva deuda
+            </button>
+
+        </div>
+
+        <div id="debtsContent"></div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- METAS -->
+    <!-- ========================= -->
+
+    <section id="section-goals" class="app-section">
+
+        <div class="section-header">
+
+            <div>
+                <h2>🎯 Metas</h2>
+                <p>Control de tus metas de ahorro</p>
+            </div>
+
+            <button class="primary-btn" id="btnNewGoal">
+                + Nueva meta
+            </button>
+
+        </div>
+
+        <div id="goalsContent"></div>
+
+    </section>
+
+</main>
+
+
+<!-- ========================= -->
+<!-- MENÚ -->
+<!-- ========================= -->
+
+<div class="modal" id="menuModal">
+
+    <div class="modal-box small">
+
+        <div class="modal-header">
+
+            <h2>Menú</h2>
+
+            <button class="close-btn" data-close="menuModal">
+                ×
+            </button>
+
+        </div>
+
+        <div class="menu-options">
+
+            <button id="btnExport">
+                💾 Exportar respaldo
+            </button>
+
+            <button id="btnRestore">
+                ♻️ Restaurar respaldo
+            </button>
+
+            <button id="btnAbout">
+                ℹ️ Acerca de FinanTrack
+            </button>
+
+        </div>
+
+        <input
+            type="file"
+            id="restoreFile"
+            accept=".json,application/json"
+            hidden
+        >
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL PERÍODO -->
+<!-- ========================= -->
+
+<div class="modal" id="periodModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="periodModalTitle">
+                Nuevo período
+            </h2>
+
+            <button class="close-btn" data-close="periodModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="periodForm">
+
+            <input type="hidden" id="periodId">
+
+            <div class="form-group">
+
+                <label>
+                    Nombre del período
+                </label>
+
+                <input
+                    type="text"
+                    id="periodName"
+                    placeholder="Ej. Octubre 2026"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Fecha de inicio
+                    </label>
+
+                    <input
+                        type="date"
+                        id="periodStart"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Fecha de finalización
+                    </label>
+
+                    <input
+                        type="date"
+                        id="periodEnd"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Dinero inicial
+                </label>
+
+                <div class="money-input">
+
+                    <span>$</span>
+
+                    <input
+                        type="number"
+                        id="periodAmount"
+                        min="0"
+                        step="0.01"
+                        placeholder="425.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Guardar período
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL ITEM MI DINERO -->
+<!-- ========================= -->
+
+<div class="modal" id="moneyItemModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="moneyItemModalTitle">
+                Nuevo item
+            </h2>
+
+            <button class="close-btn" data-close="moneyItemModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="moneyItemForm">
+
+            <input type="hidden" id="moneyItemId">
+
+            <div class="form-group">
+
+                <label>
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    id="moneyItemName"
+                    placeholder="Pago de Energía"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Monto
+                </label>
+
+                <div class="money-input">
+
+                    <span>$</span>
+
+                    <input
+                        type="number"
+                        id="moneyItemAmount"
+                        min="0"
+                        step="0.01"
+                        placeholder="50.00"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Fecha
+                </label>
+
+                <input
+                    type="date"
+                    id="moneyItemDate"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Nota (opcional)
+                </label>
+
+                <textarea
+                    id="moneyItemNote"
+                    rows="3"
+                    placeholder="Información adicional..."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Guardar item
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL DEUDA -->
+<!-- ========================= -->
+
+<div class="modal" id="debtModal">
+
+    <div class="modal-box large">
+
+        <div class="modal-header">
+
+            <h2 id="debtModalTitle">
+                Nueva deuda
+            </h2>
+
+            <button class="close-btn" data-close="debtModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="debtForm">
+
+            <input type="hidden" id="debtId">
+
+            <div class="form-group">
+
+                <label>
+                    Nombre de la deuda
+                </label>
+
+                <input
+                    type="text"
+                    id="debtName"
+                    placeholder="Ej. Motocicleta"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Precio total
+                    </label>
+
+                    <input
+                        type="number"
+                        id="debtTotalPrice"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Prima inicial
+                    </label>
+
+                    <input
+                        type="number"
+                        id="debtPremium"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Cantidad de cuotas
+                    </label>
+
+                    <input
+                        type="number"
+                        id="debtInstallments"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Cuota
+                    </label>
+
+                    <input
+                        type="number"
+                        id="debtPayment"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Primera cuota
+                    </label>
+
+                    <input
+                        type="date"
+                        id="debtFirstDate"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Frecuencia
+                    </label>
+
+                    <select id="debtFrequency">
+
+                        <option value="monthly">
+                            Mensual
+                        </option>
+
+                        <option value="weekly">
+                            Semanal
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <strong>Tabla de amortización</strong>
+
+                <p>
+                    Después de crear la deuda podrás ingresar
+                    manualmente el capital e interés de cada cuota.
+                </p>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Guardar deuda
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL DETALLE DEUDA -->
+<!-- ========================= -->
+
+<div class="modal" id="debtDetailModal">
+
+    <div class="modal-box extra-large">
+
+        <div class="modal-header">
+
+            <h2 id="debtDetailTitle">
+                Deuda
+            </h2>
+
+            <button class="close-btn" data-close="debtDetailModal">
+                ×
+            </button>
+
+        </div>
+
+        <div id="debtDetailContent"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL PAGO -->
+<!-- ========================= -->
+
+<div class="modal" id="paymentModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Registrar pago</h2>
+
+            <button class="close-btn" data-close="paymentModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="paymentForm">
+
+            <input type="hidden" id="paymentDebtId">
+            <input type="hidden" id="paymentInstallmentId">
+
+            <div id="paymentInfo"></div>
+
+            <div class="form-group">
+
+                <label>
+                    Fecha del pago
+                </label>
+
+                <input
+                    type="date"
+                    id="paymentDate"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Monto pagado
+                </label>
+
+                <div class="money-input">
+
+                    <span>$</span>
+
+                    <input
+                        type="number"
+                        id="paymentAmount"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="info-box" id="paymentCalculation"></div>
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Registrar pago
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL ABONO CAPITAL -->
+<!-- ========================= -->
+
+<div class="modal" id="extraPrincipalModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Abono a capital</h2>
+
+            <button class="close-btn" data-close="extraPrincipalModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="extraPrincipalForm">
+
+            <input type="hidden" id="extraDebtId">
+
+            <div class="form-group">
+
+                <label>
+                    Fecha
+                </label>
+
+                <input
+                    type="date"
+                    id="extraDate"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Monto
+                </label>
+
+                <div class="money-input">
+
+                    <span>$</span>
+
+                    <input
+                        type="number"
+                        id="extraAmount"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Nota
+                </label>
+
+                <textarea
+                    id="extraNote"
+                    rows="3"
+                    placeholder="Ej. Abono extraordinario"
+                ></textarea>
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Registrar abono
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL META -->
+<!-- ========================= -->
+
+<div class="modal" id="goalModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2 id="goalModalTitle">
+                Nueva meta
+            </h2>
+
+            <button class="close-btn" data-close="goalModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="goalForm">
+
+            <input type="hidden" id="goalId">
+
+            <div class="form-group">
+
+                <label>
+                    Nombre de la meta
+                </label>
+
+                <input
+                    type="text"
+                    id="goalName"
+                    placeholder="Ej. Fondo de emergencia"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Monto objetivo
+                    </label>
+
+                    <div class="money-input">
+
+                        <span>$</span>
+
+                        <input
+                            type="number"
+                            id="goalTarget"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="1000.00"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Ahorrado hasta hoy
+                    </label>
+
+                    <div class="money-input">
+
+                        <span>$</span>
+
+                        <input
+                            type="number"
+                            id="goalSaved"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Fecha de inicio
+                    </label>
+
+                    <input
+                        type="date"
+                        id="goalStartDate"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Meses para lograrla
+                    </label>
+
+                    <input
+                        type="number"
+                        id="goalMonths"
+                        min="1"
+                        max="600"
+                        step="1"
+                        placeholder="6"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Frecuencia de abono
+                </label>
+
+                <select id="goalFrequency">
+
+                    <option value="monthly">
+                        Mensual
+                    </option>
+
+                    <option value="biweekly">
+                        Quincenal (cada 15 días)
+                    </option>
+
+                    <option value="weekly">
+                        Semanal
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="info-box" id="goalPlanPreview"></div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Nota (opcional)
+                </label>
+
+                <textarea
+                    id="goalNote"
+                    rows="3"
+                    placeholder="Información adicional..."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Guardar meta
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL MOVIMIENTO DE META -->
+<!-- ========================= -->
+
+<div class="modal" id="goalContributionModal">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <h2>Movimiento de meta</h2>
+
+            <button class="close-btn" data-close="goalContributionModal">
+                ×
+            </button>
+
+        </div>
+
+        <form id="goalContributionForm">
+
+            <input type="hidden" id="contributionGoalId">
+
+            <div id="contributionInfo"></div>
+
+            <div class="form-group">
+
+                <label>
+                    Tipo
+                </label>
+
+                <select id="contributionType">
+
+                    <option value="add">
+                        Abonar a la meta
+                    </option>
+
+                    <option value="withdraw">
+                        Retirar de la meta
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Fecha
+                </label>
+
+                <input
+                    type="date"
+                    id="contributionDate"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Monto
+                </label>
+
+                <div class="money-input">
+
+                    <span>$</span>
+
+                    <input
+                        type="number"
+                        id="contributionAmount"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Nota (opcional)
+                </label>
+
+                <input
+                    type="text"
+                    id="contributionNote"
+                    placeholder="Ej. Ahorro de la quincena"
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-btn full"
+            >
+                Registrar movimiento
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- TOAST -->
+<!-- ========================= -->
+
+<div id="toast" class="toast"></div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
